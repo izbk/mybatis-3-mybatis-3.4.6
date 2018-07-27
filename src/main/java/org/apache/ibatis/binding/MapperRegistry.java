@@ -27,26 +27,34 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ *  注册Mapper接口与获取代理类实例的工具类
  * @author Clinton Begin
  * @author Eduardo Macarron
  * @author Lasse Voss
  */
 public class MapperRegistry {
 
+  // 全局配置文件
   private final Configuration config;
+  // 已知的各种类型的Mapper代理工厂Map
   private final Map<Class<?>, MapperProxyFactory<?>> knownMappers = new HashMap<Class<?>, MapperProxyFactory<?>>();
 
   public MapperRegistry(Configuration config) {
     this.config = config;
   }
 
+  /**
+   * 获取生成的代理对象
+   */
   @SuppressWarnings("unchecked")
   public <T> T getMapper(Class<T> type, SqlSession sqlSession) {
+    // 根据类型获取MapperProxyFactory,取不到就抛出异常
     final MapperProxyFactory<T> mapperProxyFactory = (MapperProxyFactory<T>) knownMappers.get(type);
     if (mapperProxyFactory == null) {
       throw new BindingException("Type " + type + " is not known to the MapperRegistry.");
     }
     try {
+      // 创建MapperProxy对象
       return mapperProxyFactory.newInstance(sqlSession);
     } catch (Exception e) {
       throw new BindingException("Error getting mapper instance. Cause: " + e, e);
@@ -87,6 +95,7 @@ public class MapperRegistry {
   }
 
   /**
+   *  扫描包下面的所有Mapper接口
    * @since 3.2.2
    */
   public void addMappers(String packageName, Class<?> superType) {

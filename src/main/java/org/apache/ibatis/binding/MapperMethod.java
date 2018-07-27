@@ -36,13 +36,16 @@ import java.lang.reflect.Type;
 import java.util.*;
 
 /**
+ *  整个代理机制的核心类，对SqlSession的操作进行封装
  * @author Clinton Begin
  * @author Eduardo Macarron
  * @author Lasse Voss
  */
 public class MapperMethod {
 
+  // 一个内部类封装了SQL标签的类型 insert update delete select
   private final SqlCommand command;
+  //一个内部类封装了方法的参数信息 返回类型信息等
   private final MethodSignature method;
 
   public MapperMethod(Class<?> mapperInterface, Method method, Configuration config) {
@@ -50,8 +53,16 @@ public class MapperMethod {
     this.method = new MethodSignature(config, mapperInterface, method);
   }
 
+  /**
+   *  通过SqlSession执行SQL
+   * @param sqlSession
+   * @param args
+   * @return
+   */
   public Object execute(SqlSession sqlSession, Object[] args) {
+    // 返回结果
     Object result;
+    // 匹配SqlCommandType
     switch (command.getType()) {
       case INSERT: {
       Object param = method.convertArgsToSqlCommandParam(args);
@@ -95,7 +106,7 @@ public class MapperMethod {
     }
     return result;
   }
-
+  // 计算返回行数
   private Object rowCountResult(int rowCount) {
     final Object result;
     if (method.returnsVoid()) {
@@ -295,6 +306,7 @@ public class MapperMethod {
       this.paramNameResolver = new ParamNameResolver(configuration, method);
     }
 
+    // 转换解析 参数
     public Object convertArgsToSqlCommandParam(Object[] args) {
       return paramNameResolver.getNamedParams(args);
     }

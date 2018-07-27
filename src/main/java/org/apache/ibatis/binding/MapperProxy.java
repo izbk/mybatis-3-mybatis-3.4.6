@@ -28,6 +28,7 @@ import org.apache.ibatis.reflection.ExceptionUtil;
 import org.apache.ibatis.session.SqlSession;
 
 /**
+ *  实现JDK动态代理接口InvocationHandler
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
@@ -44,9 +45,18 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
     this.methodCache = methodCache;
   }
 
+  /**
+   * 接口代理对象所有方法的调用，都会调用此方法
+   * @param proxy
+   * @param method
+   * @param args
+   * @return
+   * @throws Throwable
+   */
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     try {
+      //判断是不是基础方法 比如toString() hashCode()等，这些方法直接调用不需要处理
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, args);
       } else if (isDefaultMethod(method)) {
@@ -55,7 +65,9 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);
     }
+    // 缓存方法
     final MapperMethod mapperMethod = cachedMapperMethod(method);
+    // 核心方法，对SqlSession进行包装调用
     return mapperMethod.execute(sqlSession, args);
   }
 
