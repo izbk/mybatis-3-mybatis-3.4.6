@@ -334,6 +334,12 @@ public abstract class BaseExecutor implements Executor {
     return list;
   }
 
+  /**
+   * 根据日志配置创建ConnectionLog
+   * @param statementLog
+   * @return
+   * @throws SQLException
+   */
   protected Connection getConnection(Log statementLog) throws SQLException {
     Connection connection = transaction.getConnection();
     if (statementLog.isDebugEnabled()) {

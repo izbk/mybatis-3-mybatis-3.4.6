@@ -73,10 +73,13 @@ public final class MappedStatement {
       mappedStatement.resultMaps = new ArrayList<ResultMap>();
       mappedStatement.sqlCommandType = sqlCommandType;
       mappedStatement.keyGenerator = configuration.isUseGeneratedKeys() && SqlCommandType.INSERT.equals(sqlCommandType) ? Jdbc3KeyGenerator.INSTANCE : NoKeyGenerator.INSTANCE;
+      //每个MappedStatement有自己专用的Log
+      // 在每个Log加入自定义前缀LogPrefix
       String logId = id;
       if (configuration.getLogPrefix() != null) {
         logId = configuration.getLogPrefix() + id;
       }
+      // 设置本次执行的Log
       mappedStatement.statementLog = LogFactory.getLog(logId);
       mappedStatement.lang = configuration.getDefaultScriptingLanguageInstance();
     }

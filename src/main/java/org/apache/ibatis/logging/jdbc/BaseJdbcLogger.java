@@ -31,7 +31,14 @@ import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
  * Base class for proxies to do logging
- * 
+ *
+ * 日志打印基类：
+ *  其它的都是继承自该基类的子类,且都实现了InvocationHandler接口,都有public static 方法newInstance,作用根据用户是否选择日志记录来进行代理.
+ *  1. `ConnectionLogger`         // 内部一个 `Connection` 类型字段
+ * 2. `PreparedStatementLogger`  // 内部一个 `PreparedStatement` 类型字段
+ * 3. `ResultSetLogger`          // 内部一个 `ResultSet` 类型字段
+ * 4. `StatementLogger`          // 内部一个 `Statement` 类型字段
+ * 这四个Logger都实现了InvocationHandler接口,所以很明显: MyBatis使用AOP来实现了日志功能.
  * @author Clinton Begin
  * @author Eduardo Macarron
  */

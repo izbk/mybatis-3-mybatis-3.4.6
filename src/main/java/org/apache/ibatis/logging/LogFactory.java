@@ -18,6 +18,7 @@ package org.apache.ibatis.logging;
 import java.lang.reflect.Constructor;
 
 /**
+ * Mybatis日志工厂
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
@@ -30,6 +31,12 @@ public final class LogFactory {
 
   private static Constructor<? extends Log> logConstructor;
 
+  /**
+   * 静态构造块：
+   * 1.在LogFactory的静态构造块中,使用Runnable接口非阻塞式地尝试访问classpath路径下的各种当前流程的log类库
+   * 2.从而为内部静态变量logConstructor赋值,所以在静态构造块中的调用顺序就决定了变量logConstructor的值(因为tryImplementation方法中会首先判断logConstructor是否为null,不为null才会去尝试加载其它的日志框架)
+   * 3.依次顺序为: Slf4j - JCL(Jakarta Commons Logging) - Log4j - Jdk14Logging - StdOut - NoLogging
+   */
   static {
     tryImplementation(new Runnable() {
       @Override
@@ -118,6 +125,7 @@ public final class LogFactory {
   }
 
   private static void tryImplementation(Runnable runnable) {
+    // 首先判断logConstructor是否为null,不为null才会去尝试加载其它的日志框架
     if (logConstructor == null) {
       try {
         runnable.run();

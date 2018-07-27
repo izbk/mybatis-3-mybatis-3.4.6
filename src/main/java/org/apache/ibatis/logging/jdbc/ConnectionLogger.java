@@ -41,6 +41,17 @@ public final class ConnectionLogger extends BaseJdbcLogger implements Invocation
     this.connection = conn;
   }
 
+  /**
+   * 初始化时机：
+   * 1.BaseExecutor类中的 getConnection方法里调用 ConnectionLogger.newInstance
+   * 2.ConnectionLogger类中的invoke方法调用PreparedStatementLogger.newInstance和StatementLogger.newInstance.
+   * 3.PreparedStatementLogger中的invoke方法和StatementLogger中的invoke方法调用ResultSetLogger.newInstance.
+   * @param proxy
+   * @param method
+   * @param params
+   * @return
+   * @throws Throwable
+   */
   @Override
   public Object invoke(Object proxy, Method method, Object[] params)
       throws Throwable {
@@ -91,8 +102,6 @@ public final class ConnectionLogger extends BaseJdbcLogger implements Invocation
    *
    * @return the connection
    */
-  public Connection getConnection() {
-    return connection;
-  }
+  public Connection getConnection() { return connection; }
 
 }
