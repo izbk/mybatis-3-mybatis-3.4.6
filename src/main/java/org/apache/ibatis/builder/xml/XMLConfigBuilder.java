@@ -54,6 +54,7 @@ import org.apache.ibatis.type.TypeHandler;
 public class XMLConfigBuilder extends BaseBuilder {
 
   private boolean parsed;
+  // XML文件的加载和解析
   private final XPathParser parser;
   private String environment;
   private final ReflectorFactory localReflectorFactory = new DefaultReflectorFactory();
@@ -91,15 +92,22 @@ public class XMLConfigBuilder extends BaseBuilder {
     this.parser = parser;
   }
 
+  // 外部调用此方法对Mybatis配置文件进行解析
   public Configuration parse() {
     if (parsed) {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
     }
     parsed = true;
+    // Mybatis配置解析主流程
     parseConfiguration(parser.evalNode("/configuration"));
     return configuration;
   }
 
+  /**
+   * 解析configuration根节点下的子节点
+   * Mybatis核心配置信息：properties、typeAliases、plugins、objectFactory、objectWrapperFactory、settings、environments、databaseIdProvider、typeHandlers、mappers
+   * @param root
+   */
   private void parseConfiguration(XNode root) {
     try {
       //issue #117 read properties first
@@ -329,6 +337,15 @@ public class XMLConfigBuilder extends BaseBuilder {
     throw new BuilderException("Environment declaration requires a DataSourceFactory.");
   }
 
+  /**
+   * 无论是 MyBatis 在预处理语句（PreparedStatement）中设置一个参数时，还是从结果集中取出一个值时， 都会用类型处
+   * 理器将获取的值以合适的方式转换成 Java 类型。为了简化使用，mybatis在初始化TypeHandlerRegistry期间，自动注册了大部分的常用的类型处理器比如字符串、数字、
+   * 日期等。对于非标准的类型，用户可以自定义类型处理器来处理。要实现一个自定义类型处理器，只要实现org.apache.ibatis.type.TypeHandler 接口，
+   *  或继承一个实用类 org.apache.ibatis.type.BaseTypeHandler， 并将它映射到一个JDBC 类型即可
+   *
+   * @param parent
+   * @throws Exception
+   */
   private void typeHandlerElement(XNode parent) throws Exception {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
@@ -356,6 +373,18 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * Mapper 加载
+   * 需要注意的是，如果要同时使用package自动扫描和通过mapper明确指定要加载的mapper，则必须先声明mapper，然后
+   * 声明package，否则DTD校验会失败。同时一定要确保package自动扫描的范围不包含明确指定的mapper，否则在通过
+   * package扫描的interface的时候，尝试加载对应xml文件的loadXmlResource()的逻辑中出现判重出错，报
+   * org.apache.ibatis.binding.BindingException异常。
+   * 对于通过package加载的mapper文件，调用mapperRegistry.addMappers(packageName);进行加载，其核心逻辑在
+   * org.apache.ibatis.binding.MapperRegistry中，对于每个找到的接口或者mapper文件，最后调用用XMLMapperBuilder进行具体
+   * 解析。对于明确指定的mapper文件或者mapper接口，则主要使用XMLMapperBuilder进行具体解析。
+   * @param parent
+   * @throws Exception
+   */
   private void mapperElement(XNode parent) throws Exception {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {

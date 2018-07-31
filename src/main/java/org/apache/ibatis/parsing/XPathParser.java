@@ -45,8 +45,11 @@ import org.xml.sax.SAXParseException;
 public class XPathParser {
 
   private final Document document;
+  // 是否进行DTD校验
   private boolean validation;
+  // XML实体节点解析器
   private EntityResolver entityResolver;
+  // 属性配置
   private Properties variables;
   private XPath xpath;
 
@@ -209,6 +212,13 @@ public class XPathParser {
     return evalNode(document, expression);
   }
 
+  /**
+   * 所有的root.evalNode底层都是调用XML DOM的evaluate()方法，根据给定的节点表达式来计算指定的 XPath 表达式，并且返回一个XPathResult对象，
+   * 返回类型在Node.evalNode()方法中均被指定为NODE。
+   * @param root
+   * @param expression
+   * @return
+   */
   public XNode evalNode(Object root, String expression) {
     Node node = (Node) evaluate(expression, root, XPathConstants.NODE);
     if (node == null) {
@@ -230,14 +240,17 @@ public class XPathParser {
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setValidating(validation);
-
+      //设置由本工厂创建的解析器是否支持XML命名空间
       factory.setNamespaceAware(false);
       factory.setIgnoringComments(true);
       factory.setIgnoringElementContentWhitespace(false);
+      //设置是否将CDATA节点转换为Text节点
       factory.setCoalescing(false);
+      //设置是否展开实体引用节点，这里应该是sql片段引用的关键
       factory.setExpandEntityReferences(true);
 
       DocumentBuilder builder = factory.newDocumentBuilder();
+      //设置解析mybatis xml文档节点的解析器,也就是上面的XMLMapperEntityResolver
       builder.setEntityResolver(entityResolver);
       builder.setErrorHandler(new ErrorHandler() {
         @Override

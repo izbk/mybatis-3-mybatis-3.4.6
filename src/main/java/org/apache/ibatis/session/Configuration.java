@@ -92,6 +92,8 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ * mybatis中所有环境配置、resultMap集合、sql语句集合、插件列表、缓存、加载的xml列表、类型别名、类型处理器等全
+ * 部都维护在Configuration中。
  * @author Clinton Begin
  */
 public class Configuration {
@@ -841,6 +843,12 @@ public class Configuration {
     }
   }
 
+  /**
+   * Configuration中包含的静态内部类StrictMap，它继承于HashMap，对HashMap的装饰在于
+   * 增加了put时防重复的处理，get时取不到值时候的异常处理，这样核心应用层就不需要额外关心各种对象异常处理,简化应用层
+   * 逻辑。
+   * @param <V>
+   */
   protected static class StrictMap<V> extends HashMap<String, V> {
 
     private static final long serialVersionUID = -4950446264854982944L;
