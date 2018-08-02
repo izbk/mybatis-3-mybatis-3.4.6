@@ -29,6 +29,9 @@ import org.apache.ibatis.scripting.defaults.RawSqlSource;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 所有xml 标签都是由默认 MyBatis 语言提供的，而它由别名为 xml 的语言驱动器
+ * org.apache.ibatis.scripting.xmltags.XmlLanguageDriver 所提供
+ *
  * @author Eduardo Macarron
  */
 public class XMLLanguageDriver implements LanguageDriver {

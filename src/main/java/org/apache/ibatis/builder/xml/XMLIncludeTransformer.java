@@ -52,12 +52,19 @@ public class XMLIncludeTransformer {
   }
 
   /**
+   * include节点解析
+   * 总的来说，将节点分为文本节点、include、非include三类进行处理。因为一开始传递进来的是CRUD节点本身，所以第一次执行的时候，
+   * 是第一个else if，也就是source.getNodeType() == Node.ELEMENT_NODE，然后在这里开始遍历所有的子节点。
+   * 对于include节点：根据属性refid调用findSqlFragment找到sql片段，对节点中包含的占位符进行替换解析，然后调用自身进行递归解析，
+   * 解析到文本节点返回之后。判断下include的sql片段是否和包含它的节点是同一个文档，如果不是，则把它从原来的文档包含进来。然后使
+   * 用include指向的sql节点替换include节点，最后剥掉sql节点本身，也就是把sql下的节点上移一层，这样就合法了。
    * Recursively apply includes through all SQL fragments.
    * @param source Include node in DOM tree
    * @param variablesContext Current context for static variables with values
    */
   private void applyIncludes(Node source, final Properties variablesContext, boolean included) {
     if (source.getNodeName().equals("include")) {
+      // 根据属性refid调用findSqlFragment找到sql片段，对节点中包含的占位符进行替换解析，然后调用自身进行递归解析
       Node toInclude = findSqlFragment(getStringAttribute(source, "refid"), variablesContext);
       Properties toIncludeContext = getVariablesContext(source, variablesContext);
       applyIncludes(toInclude, toIncludeContext, true);
@@ -72,6 +79,8 @@ public class XMLIncludeTransformer {
     } else if (source.getNodeType() == Node.ELEMENT_NODE) {
       if (included && !variablesContext.isEmpty()) {
         // replace variables in attribute values
+        // 首先判断是否为根节点，如果是非根且变量上下文不为空，则先解析属性值上的占位符。然后对于子节点，
+        // 递归调用直到所有节点都为文本节点为止。
         NamedNodeMap attributes = source.getAttributes();
         for (int i = 0; i < attributes.getLength(); i++) {
           Node attr = attributes.item(i);
@@ -85,6 +94,7 @@ public class XMLIncludeTransformer {
     } else if (included && source.getNodeType() == Node.TEXT_NODE
         && !variablesContext.isEmpty()) {
       // replace variables in text node
+      // 根据入参变量上下文将变量设置替换进去
       source.setNodeValue(PropertyParser.parse(source.getNodeValue(), variablesContext));
     }
   }

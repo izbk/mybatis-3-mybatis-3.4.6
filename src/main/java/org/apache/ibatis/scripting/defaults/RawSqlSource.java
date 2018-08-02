@@ -28,7 +28,7 @@ import org.apache.ibatis.session.Configuration;
 /**
  * Static SqlSource. It is faster than {@link DynamicSqlSource} because mappings are 
  * calculated during startup.
- * 
+ * 原始静态SQL语句的封装,在加载时就已经确定了SQL语句,没有动态标签和${} SQL拼接,比动态SQL语句要快,因为不需要运行时解析SQL节点
  * @since 3.2.0
  * @author Eduardo Macarron
  */
@@ -43,6 +43,9 @@ public class RawSqlSource implements SqlSource {
   public RawSqlSource(Configuration configuration, String sql, Class<?> parameterType) {
     SqlSourceBuilder sqlSourceParser = new SqlSourceBuilder(configuration);
     Class<?> clazz = parameterType == null ? Object.class : parameterType;
+    // 给DynamicContext()构造器传递的parameterObject为空,所以没有参数，也不需要反射，反之就通过反射将object转为map。
+    // 因为rootSqlNode是StaticTextSqlNode类型，所以getSql就直接返回原文本，随后调用第二个构造器，首先创建一个
+    // SqlSourceBuilder实例，然后调用其parse()方法，其中ParameterMappingTokenHandler符号处理器的目的是把sql参数解析出来
     sqlSource = sqlSourceParser.parse(sql, clazz, new HashMap<String, Object>());
   }
 

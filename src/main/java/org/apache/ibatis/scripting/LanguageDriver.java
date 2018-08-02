@@ -23,6 +23,27 @@ import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.scripting.defaults.DefaultParameterHandler;
 import org.apache.ibatis.session.Configuration;
 
+/**
+ * 语言驱动器接口
+ * MyBatis 从 3.2 开始支持可插拔脚本语言，这允许你插入一种脚本语言驱动，并基于这种语言来编写动态 SQL 查询语句
+ * 一旦设定了自定义语言驱动，你就可以在 mybatis-config.xml 文件中将它设置为默认语言：
+ * <typeAliases>
+ *   <typeAlias type="org.sample.MyLanguageDriver" alias="myLanguage"/>
+ * </typeAliases>
+ * <settings>
+ *   <setting name="defaultScriptingLanguage" value="myLanguage"/>
+ * </settings>
+ * 除了设置默认语言，你也可以针对特殊的语句指定特定语言，可以通过如下的 lang 属性来完成：
+ * <select id="selectBlog" lang="myLanguage">
+ *   SELECT * FROM BLOG
+ * </select>
+ * 或者，如果你使用的是映射器接口类，在抽象方法上加上 @Lang 注解即可：
+ * public interface Mapper {
+ *   @Lang(MyLanguageDriver.class)
+ *   @Select("SELECT * FROM BLOG")
+ *   List<Blog> selectBlog();
+ * }
+ */
 public interface LanguageDriver {
 
   /**

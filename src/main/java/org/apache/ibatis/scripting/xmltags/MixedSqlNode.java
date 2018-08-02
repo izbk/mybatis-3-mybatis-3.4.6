@@ -18,6 +18,7 @@ package org.apache.ibatis.scripting.xmltags;
 import java.util.List;
 
 /**
+ * 动态标签解析后的结构
  * @author Clinton Begin
  */
 public class MixedSqlNode implements SqlNode {
@@ -29,7 +30,9 @@ public class MixedSqlNode implements SqlNode {
 
   @Override
   public boolean apply(DynamicContext context) {
+    // 遍历每个根SqlNode
     for (SqlNode sqlNode : contents) {
+      // 根据对应的表达式结果(mybatis采用ONGL作为动态表达式语言)调用下一个SqlNode进行计算即可
       sqlNode.apply(context);
     }
     return true;
