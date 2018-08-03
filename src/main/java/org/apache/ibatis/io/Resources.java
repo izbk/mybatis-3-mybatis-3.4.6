@@ -28,6 +28,8 @@ import java.util.Properties;
 /**
  * A class to simplify access to resources through the classloader.
  *
+ * 资源加载工具类
+ *
  * @author Clinton Begin
  */
 public class Resources {

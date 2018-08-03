@@ -24,6 +24,7 @@ import org.apache.ibatis.executor.result.ResultMapException;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 类型处理抽象类，内置类型处理器基类
  * @author Clinton Begin
  * @author Simone Tripodi
  */

@@ -159,6 +159,24 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 类型别名是为 Java 类型设置一个短的名字。它只和 XML 配置有关，存在的意义仅在于用来减少类完全限定名的冗余。例如:
+   *
+   * <typeAliases>
+   *   <typeAlias alias="Author" type="domain.blog.Author"/>
+   *   <typeAlias alias="Blog" type="domain.blog.Blog"/>
+   *   <typeAlias alias="Comment" type="domain.blog.Comment"/>
+   *   <typeAlias alias="Post" type="domain.blog.Post"/>
+   *   <typeAlias alias="Section" type="domain.blog.Section"/>
+   *   <typeAlias alias="Tag" type="domain.blog.Tag"/>
+   * </typeAliases>
+   * 也可以指定一个包名，MyBatis 会在包名下面搜索需要的 Java Bean，比如:
+   * <typeAliases>
+   *   <package name="domain.blog"/>
+   * </typeAliases>
+   * 每一个在包 domain.blog 中的 Java Bean，在没有注解的情况下，会使用 Bean 的首字母小写的非限定类名来作为它的别名
+   * @param parent
+   */
   private void typeAliasesElement(XNode parent) {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
@@ -183,6 +201,21 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * MyBatis 允许你在已映射语句执行过程中的某一点进行拦截调用。默认情况下，MyBatis 允许使用插件来拦截的方法调用包括：
+   * Executor (update, query, flushStatements, commit, rollback, getTransaction, close, isClosed)
+   * ParameterHandler (getParameterObject, setParameters)
+   * ResultSetHandler (handleResultSets, handleOutputParameters)
+   * StatementHandler (prepare, parameterize, batch, update, query)
+   * <!-- mybatis-config.xml -->
+   * <plugins>
+   *   <plugin interceptor="org.mybatis.example.ExamplePlugin">
+   *     <property name="someProperty" value="100"/>
+   *   </plugin>
+   * </plugins>
+   * @param parent
+   * @throws Exception
+   */
   private void pluginElement(XNode parent) throws Exception {
     if (parent != null) {
       for (XNode child : parent.getChildren()) {
@@ -195,6 +228,18 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 对象工厂解析
+   * MyBatis 每次创建结果对象的新实例时，它都会使用一个对象工厂（ObjectFactory）实例来完成。 默认的对象工厂需要做的仅仅是实例化目标类，
+   * 要么通过默认构造方法，要么在参数映射存在的时候通过参数构造方法来实例化。 如果想覆盖对象工厂的默认行为，则可以通过创建自己的对象工
+   * 厂来实现。
+   * <!-- mybatis-config.xml -->
+   * <objectFactory type="org.mybatis.example.ExampleObjectFactory">
+   *   <property name="someProperty" value="100"/>
+   * </objectFactory>
+   * @param context
+   * @throws Exception
+   */
   private void objectFactoryElement(XNode context) throws Exception {
     if (context != null) {
       String type = context.getStringAttribute("type");
@@ -221,6 +266,26 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * 解析properties标签
+   * 这些属性都是可外部配置且可动态替换的，既可以在典型的 Java 属性文件中配置，亦可通过 properties 元素的子元素来传递。
+   * 比如:
+   *
+   * <dataSource type="POOLED">
+   *   <property name="driver" value="${driver}"/>
+   *   <property name="url" value="${url}"/>
+   *   <property name="username" value="${username}"/>
+   *   <property name="password" value="${password}"/>
+   * </dataSource>
+   *
+   * 如果属性在不只一个地方进行了配置，那么 MyBatis 将按照下面的顺序来加载：
+   * 在 properties 元素体内指定的属性首先被读取。
+   * 然后根据 properties 元素中的 resource 属性读取类路径下属性文件或根据 url 属性指定的路径读取属性文件，并覆盖已读取的同名属性。
+   * 最后读取作为方法参数传递的属性，并覆盖已读取的同名属性。
+   *  ★因此，通过方法参数传递的属性具有最高优先级，resource/url 属性中指定的配置文件次之，最低优先级的是 properties 属性中指定的属性。
+   * @param context
+   * @throws Exception
+   */
   private void propertiesElement(XNode context) throws Exception {
     if (context != null) {
       Properties defaults = context.getChildrenAsProperties();
@@ -243,6 +308,11 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * MyBatis 中极为重要的调整设置，它们会改变 MyBatis 的运行时行为，解析比较简单
+   * @param props
+   * @throws Exception
+   */
   private void settingsElement(Properties props) throws Exception {
     configuration.setAutoMappingBehavior(AutoMappingBehavior.valueOf(props.getProperty("autoMappingBehavior", "PARTIAL")));
     configuration.setAutoMappingUnknownColumnBehavior(AutoMappingUnknownColumnBehavior.valueOf(props.getProperty("autoMappingUnknownColumnBehavior", "NONE")));
@@ -276,6 +346,18 @@ public class XMLConfigBuilder extends BaseBuilder {
     configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
   }
 
+  /**
+   * MyBatis 可以配置成适应多种环境，这种机制有助于将 SQL 映射应用于多种数据库之中， 现实情况下有多种理由需要这么做。
+   * 例如，开发、测试和生产环境需要有不同的配置；或者共享相同 Schema 的多个生产数据库， 想使用相同的 SQL 映射.
+   * 注意这里的关键点:
+   *
+   * 默认的环境 ID（比如:default="development"）。
+   * 每个 environment 元素定义的环境 ID（比如:id="development"）。
+   * 事务管理器的配置（比如:type="JDBC"）。
+   * 数据源的配置（比如:type="POOLED"）。
+   * @param context
+   * @throws Exception
+   */
   private void environmentsElement(XNode context) throws Exception {
     if (context != null) {
       if (environment == null) {
@@ -296,6 +378,20 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  /**
+   * MyBatis 可以根据不同的数据库厂商执行不同的语句，这种多厂商的支持是基于映射语句中的 databaseId 属性。 MyBatis 会加载不带 databaseId
+   * 属性和带有匹配当前数据库 databaseId 属性的所有语句。 如果同时找到带有 databaseId 和不带 databaseId 的相同语句，则后者会被舍弃。 为
+   * 支持多厂商特性只要像下面这样在 mybatis-config.xml 文件中加入 databaseIdProvider 即可：
+   *
+   * <databaseIdProvider type="DB_VENDOR">
+   *   <property name="SQL Server" value="sqlserver"/>
+   *   <property name="DB2" value="db2"/>
+   *   <property name="Oracle" value="oracle" />
+   * </databaseIdProvider>
+   *
+   * @param context
+   * @throws Exception
+   */
   private void databaseIdProviderElement(XNode context) throws Exception {
     DatabaseIdProvider databaseIdProvider = null;
     if (context != null) {
