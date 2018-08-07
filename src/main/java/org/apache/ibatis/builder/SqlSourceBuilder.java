@@ -30,6 +30,7 @@ import org.apache.ibatis.type.JdbcType;
 
 /**
  * 静态SQL解析
+ * SqlSourceBuilder继承BaseBuilder主要是为了复用BaseBuilder的功能.
  * @author Clinton Begin
  */
 public class SqlSourceBuilder extends BaseBuilder {
@@ -47,6 +48,9 @@ public class SqlSourceBuilder extends BaseBuilder {
     return new StaticSqlSource(configuration, sql, handler.getParameterMappings());
   }
 
+  /**
+   * ParameterMapping处理器
+   */
   private static class ParameterMappingTokenHandler extends BaseBuilder implements TokenHandler {
 
     private List<ParameterMapping> parameterMappings = new ArrayList<ParameterMapping>();
@@ -69,6 +73,12 @@ public class SqlSourceBuilder extends BaseBuilder {
       return "?";
     }
 
+    /**
+     * 构造ParameterMapping实例
+     * ParameterMapping类就是封装了程序员所书写的#{ }中的所有内容.
+     * @param content
+     * @return
+     */
     private ParameterMapping buildParameterMapping(String content) {
       Map<String, String> propertiesMap = parseParameterMapping(content);
       String property = propertiesMap.get("property");

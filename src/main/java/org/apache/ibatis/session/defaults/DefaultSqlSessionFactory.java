@@ -37,6 +37,7 @@ import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
  */
 public class DefaultSqlSessionFactory implements SqlSessionFactory {
 
+  // 理解final关键字含义
   private final Configuration configuration;
 
   public DefaultSqlSessionFactory(Configuration configuration) {

@@ -29,6 +29,9 @@ import java.util.HashMap;
  * attribute = name '=' value
  * </pre>
  *
+ * 封装了对#{ }中内容的解析逻辑
+ * 其继承自HashMap<String, String>,所以可以将解析的结果以键值对的方法存储起来
+ * 外界对其的调用直接以Map的方式获取即可
  * @author Frank D. Martinez [mnesarco]
  */
 public class ParameterExpression extends HashMap<String, String> {
