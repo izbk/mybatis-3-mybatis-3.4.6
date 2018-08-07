@@ -31,7 +31,9 @@ import java.util.TreeSet;
 import org.apache.ibatis.reflection.ReflectionException;
 
 /**
- * @author Clinton Begin
+ * 默认的对象工厂需要做的仅仅是实例化目标类，要么通过默认构造方法，要么在参数映射存在的时候通过参数构造方法来实例化
+ * 如果想覆盖对象工厂的默认行为，则可以通过创建自己的对象工厂来实现。
+ * @author Clinton BeginDefaultOb
  */
 public class DefaultObjectFactory implements ObjectFactory, Serializable {
 
@@ -55,6 +57,14 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
     // no props for default
   }
 
+  /**
+   * 反射调用构造函数
+   * @param type
+   * @param constructorArgTypes
+   * @param constructorArgs
+   * @param <T>
+   * @return
+   */
   private  <T> T instantiateClass(Class<T> type, List<Class<?>> constructorArgTypes, List<Object> constructorArgs) {
     try {
       Constructor<T> constructor;
@@ -91,6 +101,11 @@ public class DefaultObjectFactory implements ObjectFactory, Serializable {
     }
   }
 
+  /**
+   *  解析常用数据结构接口的默认实现类型
+   * @param type
+   * @return
+   */
   protected Class<?> resolveInterface(Class<?> type) {
     Class<?> classToCreate;
     if (type == List.class || type == Collection.class || type == Iterable.class) {
