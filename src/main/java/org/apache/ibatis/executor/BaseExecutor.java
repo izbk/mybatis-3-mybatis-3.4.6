@@ -45,6 +45,7 @@ import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ * 执行器抽象基类
  * @author Clinton Begin
  */
 public abstract class BaseExecutor implements Executor {
@@ -136,6 +137,18 @@ public abstract class BaseExecutor implements Executor {
     return query(ms, parameter, rowBounds, resultHandler, key, boundSql);
  }
 
+    /**
+     * BaseExecutor实现的查询
+     * @param ms
+     * @param parameter
+     * @param rowBounds
+     * @param resultHandler
+     * @param key
+     * @param boundSql
+     * @param <E>
+     * @return
+     * @throws SQLException
+     */
   @SuppressWarnings("unchecked")
   @Override
   public <E> List<E> query(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
@@ -191,16 +204,24 @@ public abstract class BaseExecutor implements Executor {
     }
   }
 
+    /**
+     *  生成Sql缓存key
+     * @param ms
+     * @param parameterObject
+     * @param rowBounds
+     * @param boundSql
+     * @return
+     */
   @Override
   public CacheKey createCacheKey(MappedStatement ms, Object parameterObject, RowBounds rowBounds, BoundSql boundSql) {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
     CacheKey cacheKey = new CacheKey();
-    cacheKey.update(ms.getId());
-    cacheKey.update(rowBounds.getOffset());
-    cacheKey.update(rowBounds.getLimit());
-    cacheKey.update(boundSql.getSql());
+    cacheKey.update(ms.getId());                      // 方法名
+    cacheKey.update(rowBounds.getOffset());// 逻辑分页偏移量
+    cacheKey.update(rowBounds.getLimit());    // 逻辑分页起始值
+    cacheKey.update(boundSql.getSql());          // sql语句
     List<ParameterMapping> parameterMappings = boundSql.getParameterMappings();
     TypeHandlerRegistry typeHandlerRegistry = ms.getConfiguration().getTypeHandlerRegistry();
     // mimic DefaultParameterHandler logic
@@ -218,12 +239,12 @@ public abstract class BaseExecutor implements Executor {
           MetaObject metaObject = configuration.newMetaObject(parameterObject);
           value = metaObject.getValue(propertyName);
         }
-        cacheKey.update(value);
+        cacheKey.update(value);// 额外参数、参数值
       }
     }
     if (configuration.getEnvironment() != null) {
       // issue #176
-      cacheKey.update(configuration.getEnvironment().getId());
+      cacheKey.update(configuration.getEnvironment().getId()); // environmentId
     }
     return cacheKey;
   }
@@ -319,6 +340,18 @@ public abstract class BaseExecutor implements Executor {
     }
   }
 
+    /**
+     * 查询数据库
+     * @param ms
+     * @param parameter
+     * @param rowBounds
+     * @param resultHandler
+     * @param key
+     * @param boundSql
+     * @param <E>
+     * @return
+     * @throws SQLException
+     */
   private <E> List<E> queryFromDatabase(MappedStatement ms, Object parameter, RowBounds rowBounds, ResultHandler resultHandler, CacheKey key, BoundSql boundSql) throws SQLException {
     List<E> list;
     localCache.putObject(key, EXECUTION_PLACEHOLDER);

@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
+ *  Key的构成：cacheKey=ID + offset + limit + sql + parameterValues + environmentId
  * @author Clinton Begin
  */
 public class CacheKey implements Cloneable, Serializable {
@@ -30,6 +31,7 @@ public class CacheKey implements Cloneable, Serializable {
 
   public static final CacheKey NULL_CACHE_KEY = new NullCacheKey();
 
+  // 计算hashCode的参数，HashMap计算也是使用37
   private static final int DEFAULT_MULTIPLYER = 37;
   private static final int DEFAULT_HASHCODE = 17;
 

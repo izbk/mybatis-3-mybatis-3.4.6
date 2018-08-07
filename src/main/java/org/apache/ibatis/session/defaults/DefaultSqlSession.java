@@ -43,7 +43,7 @@ import org.apache.ibatis.session.SqlSession;
  *
  * The default implementation for {@link SqlSession}.
  * Note that this class is not Thread-Safe.
- *
+ * 默认SqlSession实现，各种CURD操作都是通过Executor进行的。
  * @author Clinton Begin
  */
 public class DefaultSqlSession implements SqlSession {
@@ -144,7 +144,9 @@ public class DefaultSqlSession implements SqlSession {
   @Override
   public <E> List<E> selectList(String statement, Object parameter, RowBounds rowBounds) {
     try {
+        // 1.获取MappedStatement
       MappedStatement ms = configuration.getMappedStatement(statement);
+      // 2.这里的executor是CachingExecutor
       return executor.query(ms, wrapCollection(parameter), rowBounds, Executor.NO_RESULT_HANDLER);
     } catch (Exception e) {
       throw ExceptionFactory.wrapException("Error querying database.  Cause: " + e, e);

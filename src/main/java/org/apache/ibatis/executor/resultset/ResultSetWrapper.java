@@ -36,6 +36,8 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
+ * ResultSetWrapper是ResultSet的包装类，调用getFirstResultSet方法获取第一个ResultSet，同时获取数据库的
+ * MetaData数据，包括数据表列名、列的类型、类序号等，这些信息都存储在ResultSetWrapper类中了
  * @author Iwao AVE!
  */
 public class ResultSetWrapper {
