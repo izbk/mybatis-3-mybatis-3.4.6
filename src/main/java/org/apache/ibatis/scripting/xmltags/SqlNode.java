@@ -23,5 +23,6 @@ package org.apache.ibatis.scripting.xmltags;
  * @author Clinton Begin
  */
 public interface SqlNode {
+  // DynamicContext的作用就是为各个动态sql节点实现类(诸如ChooseSqlNode等)提供进行判断的上下信息.确保判断等操作的完整实现
   boolean apply(DynamicContext context);
 }
