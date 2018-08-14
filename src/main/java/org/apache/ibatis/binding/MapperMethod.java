@@ -37,6 +37,8 @@ import java.util.*;
 
 /**
  *  整个代理机制的核心类，对SqlSession的操作进行封装
+ *  MapperMethod采用命令模式运行，并根据上下文跳转。MapperMethod在构造器初始化时会根据Configuration和Mapper的Method方法解析为SqlCommand命令。
+ *  之后在execute方法，根据SqlCommand的Type进行跳转。然后采用命令模式，SqlSession通过SqlCommand执行插入、更新、查询、选择等方法。
  * @author Clinton Begin
  * @author Eduardo Macarron
  * @author Lasse Voss
@@ -49,6 +51,7 @@ public class MapperMethod {
   private final MethodSignature method;
 
   public MapperMethod(Class<?> mapperInterface, Method method, Configuration config) {
+    // 根据Configuration和Mapper的Method方法解析为SqlCommand
     this.command = new SqlCommand(config, mapperInterface, method);
     this.method = new MethodSignature(config, mapperInterface, method);
   }

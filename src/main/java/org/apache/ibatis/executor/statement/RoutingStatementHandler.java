@@ -30,7 +30,9 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 /**
+ * 作用是给实现类对象的使用提供一个统一、简易的使用适配器
  * @author Clinton Begin
+ *
  */
 public class RoutingStatementHandler implements StatementHandler {
 
