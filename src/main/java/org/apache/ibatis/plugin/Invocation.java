@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
+ * 被拦截方法的信息封装
  * @author Clinton Begin
  */
 public class Invocation {
@@ -45,6 +46,10 @@ public class Invocation {
     return args;
   }
 
+  // 这个方法会调度被代理对象的真实方法， 所以我们通过这个方法直接调用被代理对象原来的方法
+  // 如果多个插件的话，我们知道会生成多层代理对象，那么每层被代理都可以通过Invocation调用这个proceed方法，
+  // 所以在多个插件的环境下，调度proceed()方法时，MyBatis总是从最后一个代理对象运行到第一个代理对象，
+  // 最后是真实被拦截的对象方法被运行
   public Object proceed() throws InvocationTargetException, IllegalAccessException {
     return method.invoke(target, args);
   }

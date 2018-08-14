@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ *  插件链
  * @author Clinton Begin
  */
 public class InterceptorChain {
@@ -28,6 +29,8 @@ public class InterceptorChain {
 
   public Object pluginAll(Object target) {
     for (Interceptor interceptor : interceptors) {
+      // plugin方法是生成代理对象的方法
+      // 可以看出来，如果有多个插件的话，会生成多层代理的代理对象
       target = interceptor.plugin(target);
     }
     return target;
