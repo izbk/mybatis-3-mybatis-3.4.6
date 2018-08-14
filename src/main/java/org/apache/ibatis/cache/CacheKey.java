@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
+ *  缓存的核心组件
  *  Key的构成：cacheKey=ID + offset + limit + sql + parameterValues + environmentId
  * @author Clinton Begin
  */

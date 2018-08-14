@@ -114,6 +114,7 @@ public abstract class BaseExecutor implements Executor {
     if (closed) {
       throw new ExecutorException("Executor was closed.");
     }
+    // 清理一级缓存
     clearLocalCache();
     return doUpdate(ms, parameter);
   }
@@ -164,6 +165,7 @@ public abstract class BaseExecutor implements Executor {
       queryStack++;
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
+        // 处理存储过程参数
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
       } else {
         list = queryFromDatabase(ms, parameter, rowBounds, resultHandler, key, boundSql);
@@ -179,6 +181,8 @@ public abstract class BaseExecutor implements Executor {
       deferredLoads.clear();
       if (configuration.getLocalCacheScope() == LocalCacheScope.STATEMENT) {
         // issue #482
+        // 判断一级缓存级别是否是STATEMENT级别，如果是的话，就清空缓存，这也就是STATEMENT
+        // 级别的一级缓存无法共享localCache的原因
         clearLocalCache();
       }
     }

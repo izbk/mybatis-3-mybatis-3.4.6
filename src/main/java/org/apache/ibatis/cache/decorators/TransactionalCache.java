@@ -27,7 +27,7 @@ import org.apache.ibatis.logging.LogFactory;
 
 /**
  * The 2nd level cache transactional buffer.
- * 
+ *  二级缓存
  * This class holds all cache entries that are to be added to the 2nd level cache during a Session.
  * Entries are sent to the cache when commit is called or discarded if the Session is rolled back. 
  * Blocking cache support has been added. Therefore any get() that returns a cache miss 
@@ -98,6 +98,9 @@ public class TransactionalCache implements Cache {
     entriesToAddOnCommit.clear();
   }
 
+  /**
+   * 提交才刷新缓存
+   */
   public void commit() {
     if (clearOnCommit) {
       delegate.clear();
