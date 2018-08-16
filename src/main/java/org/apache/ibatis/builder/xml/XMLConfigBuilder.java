@@ -366,9 +366,12 @@ public class XMLConfigBuilder extends BaseBuilder {
       for (XNode child : context.getChildren()) {
         String id = child.getStringAttribute("id");
         if (isSpecifiedEnvironment(id)) {
+          // 解析transactionManager配置
           TransactionFactory txFactory = transactionManagerElement(child.evalNode("transactionManager"));
+          // 解析DataSource配置
           DataSourceFactory dsFactory = dataSourceElement(child.evalNode("dataSource"));
           DataSource dataSource = dsFactory.getDataSource();
+          // 使用了Environment内置的构造器Builder，传递id 事务工厂TransactionFactory和数据源DataSource
           Environment.Builder environmentBuilder = new Environment.Builder(id)
               .transactionFactory(txFactory)
               .dataSource(dataSource);
@@ -413,6 +416,8 @@ public class XMLConfigBuilder extends BaseBuilder {
 
   private TransactionFactory transactionManagerElement(XNode context) throws Exception {
     if (context != null) {
+      // 如果type = "JDBC",则MyBatis会创建一个JdbcTransactionFactory.class 实例；
+      // 如果type="MANAGED"，则MyBatis会创建一个MangedTransactionFactory.class实例
       String type = context.getStringAttribute("type");
       Properties props = context.getChildrenAsProperties();
       TransactionFactory factory = (TransactionFactory) resolveClass(type).newInstance();

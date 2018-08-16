@@ -31,6 +31,7 @@ import org.apache.ibatis.transaction.TransactionException;
  * Delays connection retrieval until getConnection() is called.
  * Ignores commit or rollback requests when autocommit is on.
  *
+ * 封装JDBC连接处理事务
  * @author Clinton Begin
  *
  * @see JdbcTransactionFactory
